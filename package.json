@@ -1,0 +1,41 @@
+{
+  "name": "df-state-shapes",
+  "version": "1.0.0",
+  "description": "SVG shapes for US states, DC, and the United States — with a typed lookup API",
+  "type": "module",
+  "license": "MIT",
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "assets"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./assets/us/*": "./assets/us/*",
+    "./assets/us-theme/*": "./assets/us-theme/*",
+    "./manifest.json": "./dist/manifest.json"
+  },
+  "scripts": {
+    "generate:theme": "node scripts/generate-theme-svgs.mjs",
+    "build:js": "tsup",
+    "build:manifest": "node scripts/generate-manifest.mjs",
+    "prebuild": "npm run generate:theme",
+    "build": "npm run build:js && npm run build:manifest",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm run build"
+  },
+  "devDependencies": {
+    "tsup": "^8.4.0",
+    "typescript": "^5.8.2"
+  },
+  "keywords": [
+    "svg",
+    "states",
+    "usa",
+    "geography",
+    "icons"
+  ]
+}
