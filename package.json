@@ -1,13 +1,14 @@
 {
   "name": "df-state-shapes",
-  "version": "1.0.0",
-  "description": "SVG shapes for US states, DC, and the United States — with a typed lookup API",
+  "version": "2.0.0",
+  "description": "SVG shapes for US states and world countries — with a typed lookup API",
   "type": "module",
   "license": "MIT",
   "sideEffects": false,
   "files": [
     "dist",
-    "assets"
+    "assets",
+    "scripts/generated/world-regions.json"
   ],
   "exports": {
     ".": {
@@ -16,13 +17,17 @@
     },
     "./assets/us/*": "./assets/us/*",
     "./assets/us-theme/*": "./assets/us-theme/*",
+    "./assets/world/*": "./assets/world/*",
+    "./assets/world-theme/*": "./assets/world-theme/*",
     "./manifest.json": "./dist/manifest.json"
   },
   "scripts": {
+    "normalize:world": "node scripts/normalize-world-svgs.mjs",
+    "generate:world-ts": "node scripts/generate-world-ts.mjs",
     "generate:theme": "node scripts/generate-theme-svgs.mjs",
     "build:js": "tsup",
     "build:manifest": "node scripts/generate-manifest.mjs",
-    "prebuild": "npm run generate:theme",
+    "prebuild": "npm run normalize:world && npm run generate:world-ts && npm run generate:theme",
     "build": "npm run build:js && npm run build:manifest",
     "prepare": "npm run build",
     "prepublishOnly": "npm run build"
@@ -34,6 +39,7 @@
   "keywords": [
     "svg",
     "states",
+    "countries",
     "usa",
     "geography",
     "icons"
