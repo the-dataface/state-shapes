@@ -106,9 +106,16 @@ export type StateSlug =
   | 'wisconsin'
   | 'wyoming';
 
-export type CountryCode = 'us';
+export type SubdivisionRegion = 'us';
+
+/** @deprecated Use SubdivisionRegion */
+export type CountryCode = SubdivisionRegion;
 
 export type ShapeVariant = 'default' | 'theme';
+
+export type GetCountryShapeOptions = {
+  variant?: ShapeVariant;
+};
 
 export type StateShape = {
   code: StateCode;
@@ -118,11 +125,19 @@ export type StateShape = {
 };
 
 export type GetStateShapeOptions = {
-  country?: CountryCode;
+  /** Which country's subdivisions to use (default: `'us'`) */
+  country?: SubdivisionRegion;
   variant?: ShapeVariant;
 };
 
 export type StateRegion = {
   slug: StateSlug;
   name: string;
+};
+
+export type CountryShape = {
+  code: import('./world.generated.js').IsoCode;
+  slug: import('./world.generated.js').CountrySlug;
+  name: string;
+  path: string;
 };

@@ -1,10 +1,10 @@
-import type { CountryCode, GetStateShapeOptions, ShapeVariant, StateCode } from './types.js';
+import type { GetStateShapeOptions, ShapeVariant, StateCode, SubdivisionRegion } from './types.js';
 import { US_REGIONS } from './us.js';
 
-const DEFAULT_COUNTRY: CountryCode = 'us';
+const DEFAULT_COUNTRY: SubdivisionRegion = 'us';
 const DEFAULT_VARIANT: ShapeVariant = 'default';
 
-function getAssetDirectory(country: CountryCode, variant: ShapeVariant): string {
+function getAssetDirectory(country: SubdivisionRegion, variant: ShapeVariant): string {
   if (country !== 'us') {
     throw new Error(`Unsupported country: ${country}`);
   }

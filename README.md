@@ -1,8 +1,8 @@
 # df-state-shapes
 
-SVG shapes for US states, DC, and the United States — with a typed lookup API.
+SVG shapes for US states and world countries — with a typed lookup API.
 
-Each shape is a 128×128 icon with a single path. Shapes are normalized for UI use (not geographic projections).
+US state icons are 128×128 with a single path. World country icons are 205×205 with multiple paths. Shapes are normalized for UI use (not geographic projections).
 
 ## Install
 
@@ -11,6 +11,8 @@ npm install df-state-shapes
 ```
 
 ## Quick start
+
+### US states
 
 ```ts
 import { getStateShape, dfStateShapes } from 'df-state-shapes';
@@ -26,86 +28,104 @@ const california = getStateShape('CA');
 const themed = getStateShape('CA', { variant: 'theme' });
 // path → assets/us-theme/california.svg
 
-const all = dfStateShapes.list(); // 52 shapes
+dfStateShapes.list(); // 52 shapes
 ```
+
+### World countries
+
+```ts
+import { getCountryShape, dfCountryShapes } from 'df-state-shapes';
+
+const canada = getCountryShape('CA');
+// {
+//   code: 'CA',
+//   slug: 'ca',
+//   name: 'Canada',
+//   path: 'assets/world/ca.svg'
+// }
+
+const themed = getCountryShape('JP', { variant: 'theme' });
+// path → assets/world-theme/jp.svg
+
+dfCountryShapes.list(); // 242 countries
+```
+
+## Code collisions
+
+Some ISO codes overlap with US state abbreviations. Use the right API:
+
+| Code | `getStateShape` | `getCountryShape` |
+|------|-----------------|-------------------|
+| `CA` | California | Canada |
+| `US` | US outline (128×128, `assets/us/united-states.svg`) | United States (205×205, `assets/world/us.svg`) |
+| `GA` | Georgia (state) | Gabon (country) |
 
 ## API
 
-### `getStateShape(code, options?)`
-
-Returns metadata and a package-relative asset path for a state code.
+### US subdivisions — `getStateShape(code, options?)`
 
 | Option | Default | Values |
 |--------|---------|--------|
-| `country` | `'us'` | `'us'` (more countries planned) |
-| `variant` | `'default'` | `'default'` (fill `#030712`) or `'theme'` (`currentColor`) |
+| `country` | `'us'` | `'us'` (more subdivision regions planned) |
+| `variant` | `'default'` | `'default'` or `'theme'` |
 
-**Codes:** standard USPS abbreviations (`CA`, `NY`, …), plus `DC` and `US` (whole-country outline).
+**Codes:** USPS abbreviations (`CA`, `NY`, …), plus `DC` and `US`.
 
-### `listStateShapes(options?)`
+Also: `listStateShapes()`, `dfStateShapes`, `resolveStateShapePath()`.
 
-Returns all shapes for a country. Currently 52 entries: 50 states + DC + US.
+### World countries — `getCountryShape(code, options?)`
 
-### `dfStateShapes`
+| Option | Default | Values |
+|--------|---------|--------|
+| `variant` | `'default'` | `'default'` or `'theme'` |
 
-Namespace object with `.get()` and `.list()` — same as the functions above.
+**Codes:** ISO 3166-1 alpha-2 (`CA`, `JP`, `GB`, …) — 242 countries and territories.
 
-### `resolveStateShapePath(code, options?)`
-
-Returns only the asset path string when you don't need full metadata.
+Also: `listCountryShapes()`, `dfCountryShapes`, `resolveCountryShapePath()`.
 
 ## Direct SVG imports
 
-Import SVG files directly in bundlers that support it (Vite, Webpack 5+, etc.):
-
 ```ts
 import californiaUrl from 'df-state-shapes/assets/us/california.svg?url';
+import canadaUrl from 'df-state-shapes/assets/world/ca.svg?url';
 
 // With SVGR (React):
 import California from 'df-state-shapes/assets/us/california.svg?react';
+import Canada from 'df-state-shapes/assets/world/ca.svg?react';
 ```
 
 ## Theming
 
-Default shapes use a fixed near-black fill (`#030712`). Themeable variants use `currentColor`:
+Default shapes use `#030712`. Theme variants use `currentColor`:
 
 ```ts
-import { getStateShape } from 'df-state-shapes';
-
-const { path } = getStateShape('CA', { variant: 'theme' });
-// assets/us-theme/california.svg
+getStateShape('CA', { variant: 'theme' });   // assets/us-theme/california.svg
+getCountryShape('CA', { variant: 'theme' }); // assets/world-theme/ca.svg
 ```
 
 ```css
-.state-icon {
+.shape-icon {
   color: #2563eb;
 }
 ```
 
-Or import directly:
-
-```ts
-import 'df-state-shapes/assets/us-theme/california.svg';
-```
-
 ## CDN
 
-Serve assets without npm via jsDelivr:
-
 ```
-https://cdn.jsdelivr.net/npm/df-state-shapes@1/assets/us/california.svg
-https://cdn.jsdelivr.net/npm/df-state-shapes@1/assets/us-theme/california.svg
+https://cdn.jsdelivr.net/npm/df-state-shapes@2/assets/us/california.svg
+https://cdn.jsdelivr.net/npm/df-state-shapes@2/assets/world/ca.svg
+https://cdn.jsdelivr.net/npm/df-state-shapes@2/assets/world-theme/jp.svg
 ```
 
 ## Manifest
 
-Non-TypeScript consumers can use the generated manifest:
-
 ```ts
 import manifest from 'df-state-shapes/manifest.json';
+// manifest.us — 52 US shapes
+// manifest.world — 242 countries
 ```
 
-## Code → slug reference
+## US code → slug reference
 
 | Code | Slug | Name |
 |------|------|------|
@@ -162,26 +182,36 @@ import manifest from 'df-state-shapes/manifest.json';
 | WI | wisconsin | Wisconsin |
 | WY | wyoming | Wyoming |
 
+World countries use lowercase ISO slugs (`CA` → `ca.svg`, `JP` → `jp.svg`). Use `listCountryShapes()` or the manifest for the full list.
+
 ## Asset layout
 
 ```
 assets/
-├── us/           # default fills
-└── us-theme/     # currentColor fills (generated at build)
+├── us/           # US subdivisions (default fills)
+├── us-theme/     # US theme variants (generated at build)
+├── world/        # World countries (default fills)
+└── world-theme/  # World theme variants (generated at build)
 ```
 
-Future regions (e.g. Canadian provinces) will follow the same pattern under `assets/ca/`, using `getStateShape('ON', { country: 'ca' })`.
+Future subdivision regions (e.g. Canadian provinces) will follow the US pattern under `assets/ca/`, using `getStateShape('ON', { country: 'ca' })`.
 
-## Migration from `states/`
+## Migration from v1
 
-SVGs previously lived at `states/california.svg`. They now live at `assets/us/california.svg`. Update any raw GitHub or CDN links accordingly.
+- US API unchanged — `getStateShape('CA')` still returns California
+- New country API — `getCountryShape('CA')` returns Canada
+- CDN URLs: pin `@2` for world assets
+
+SVGs previously lived at `states/california.svg`. They now live at `assets/us/california.svg`.
 
 ## Development
 
 ```bash
 npm install
-npm run build        # generate theme SVGs, compile TS, write manifest
-npm run generate:theme
+npm run build              # normalize world SVGs, codegen, theme, compile, manifest
+npm run normalize:world    # Figma names → ISO slugs (first run only)
+npm run generate:world-ts  # regenerate src/world.generated.ts
+npm run generate:theme     # regenerate theme SVGs
 ```
 
 ## License
